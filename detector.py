@@ -74,16 +74,18 @@ def _wait_close(window_title: str):
 def detect_camera(
     threshold: int = CONFIDENCE_THRESHOLD,
     camera_index: int = 0,
+    app_name: str = "Face Recognition",
 ) -> None:
     """
-    Deteksi dan kenali wajah secara real-time dari kamera.
+    Detect and recognize faces in real-time from camera.
 
     Args:
-        threshold   : LBPH confidence < threshold = dikenali.
-        camera_index: Index kamera (default 0).
+        threshold   : LBPH confidence < threshold = recognized.
+        camera_index: Camera index (default 0).
+        app_name    : Application name shown in window title.
 
     Raises:
-        RuntimeError: Jika model belum ada atau kamera tidak bisa dibuka.
+        RuntimeError: If model not found or camera cannot be opened.
     """
     recognizer   = _load_model()
     labels       = lbl.load()
@@ -93,7 +95,7 @@ def detect_camera(
     if not cap.isOpened():
         raise RuntimeError(f"Gagal membuka kamera (index {camera_index}).")
 
-    WIN = "Deteksi Wajah — ecolube.id"
+    WIN = f"Face Detection — {app_name}"
     cv2.namedWindow(WIN, cv2.WINDOW_NORMAL)
 
     while True:
@@ -115,15 +117,15 @@ def detect_camera(
             result = FaceResult(
                 x=x, y=y, w=w, h=h,
                 user_id=lid if recognized else None,
-                name=labels.get(str(lid), "?") if recognized else "Tidak Dikenal",
+                name=labels.get(str(lid), "?") if recognized else "Unknown",
                 confidence=conf,
                 recognized=recognized,
             )
             _draw_result(frame, result)
 
-        cv2.putText(frame, f"Terdaftar: {len(labels)} orang", (10, 30),
+        cv2.putText(frame, f"Registered: {len(labels)}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 220, 0), 2)
-        cv2.putText(frame, "Tekan 'q' / Esc untuk keluar", (10, frame.shape[0] - 12),
+        cv2.putText(frame, "Press 'q' / Esc to quit", (10, frame.shape[0] - 12),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 2)
         cv2.imshow(WIN, frame)
 
@@ -139,21 +141,23 @@ def detect_image(
     img_path: str,
     threshold: int = CONFIDENCE_THRESHOLD,
     show: bool = True,
+    app_name: str = "Face Recognition",
 ) -> DetectionResult:
     """
-    Deteksi dan kenali wajah dari file gambar.
+    Detect and recognize faces from an image file.
 
     Args:
-        img_path  : Path ke file gambar.
-        threshold : LBPH confidence < threshold = dikenali.
-        show      : Tampilkan jendela hasil jika True.
+        img_path  : Path to image file.
+        threshold : LBPH confidence < threshold = recognized.
+        show      : Show result window if True.
+        app_name  : Application name shown in window title.
 
     Returns:
-        DetectionResult berisi daftar FaceResult.
+        DetectionResult containing a list of FaceResult.
 
     Raises:
-        ValueError  : Jika file tidak ditemukan atau gagal dibaca.
-        RuntimeError: Jika model belum ada.
+        ValueError  : If file not found or cannot be read.
+        RuntimeError: If model not found.
     """
     if not os.path.exists(img_path):
         raise ValueError(f"File tidak ditemukan: {img_path}")
@@ -173,17 +177,18 @@ def detect_image(
 
     results: list[FaceResult] = []
 
+    WIN_IMG = f"Image Detection — {app_name}"
+
     if len(faces) == 0:
         if show:
-            WIN = "Deteksi Wajah dari Gambar — ecolube.id"
-            cv2.namedWindow(WIN, cv2.WINDOW_NORMAL)
-            cv2.putText(frame, "Tidak ada wajah terdeteksi", (10, 30),
+            cv2.namedWindow(WIN_IMG, cv2.WINDOW_NORMAL)
+            cv2.putText(frame, "No face detected", (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 220), 2)
-            cv2.putText(frame, "Tekan 'q' / Esc / X untuk tutup",
+            cv2.putText(frame, "Press 'q' / Esc / X to close",
                         (10, frame.shape[0] - 12),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 2)
-            cv2.imshow(WIN, frame)
-            _wait_close(WIN)
+            cv2.imshow(WIN_IMG, frame)
+            _wait_close(WIN_IMG)
         return DetectionResult(image_path=img_path, total_faces=0, faces=[])
 
     for (x, y, w, h) in faces:
@@ -192,7 +197,7 @@ def detect_image(
         r = FaceResult(
             x=x, y=y, w=w, h=h,
             user_id=lid if recognized else None,
-            name=labels.get(str(lid), "?") if recognized else "Tidak Dikenal",
+            name=labels.get(str(lid), "?") if recognized else "Unknown",
             confidence=conf,
             recognized=recognized,
         )
@@ -201,15 +206,14 @@ def detect_image(
             _draw_result(frame, r)
 
     if show:
-        WIN = "Deteksi Wajah dari Gambar — ecolube.id"
-        cv2.namedWindow(WIN, cv2.WINDOW_NORMAL)
-        cv2.putText(frame, f"Terdaftar: {len(labels)} orang", (10, 30),
+        cv2.namedWindow(WIN_IMG, cv2.WINDOW_NORMAL)
+        cv2.putText(frame, f"Registered: {len(labels)}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 220, 0), 2)
-        cv2.putText(frame, "Tekan 'q' / Esc / X untuk tutup",
+        cv2.putText(frame, "Press 'q' / Esc / X to close",
                     (10, frame.shape[0] - 12),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 2)
-        cv2.imshow(WIN, frame)
-        _wait_close(WIN)
+        cv2.imshow(WIN_IMG, frame)
+        _wait_close(WIN_IMG)
 
     return DetectionResult(
         image_path=img_path,

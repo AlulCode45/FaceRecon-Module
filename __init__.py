@@ -1,35 +1,38 @@
 """
-facerecog/__init__.py
-High-level API — semua fitur cukup lewat class FaceRecog.
+facerecog — Face Recognition Module
+High-level API: all features available through the FaceRecog class.
 
-Contoh penggunaan cepat:
+Quick start:
 
     from facerecog import FaceRecog
 
     fr = FaceRecog()
 
-    # Daftarkan via kamera
-    fr.register_from_camera("Budi")
+    # Register via camera
+    fr.register_from_camera("Alice")
 
-    # Daftarkan via gambar/folder
-    fr.register_from_image("Budi", "/path/ke/foto_budi/")
+    # Register via image file or folder
+    fr.register_from_image("Alice", "/path/to/photos/")
 
-    # Latih model
+    # Train the model
     fr.train()
 
-    # Deteksi dari kamera (real-time)
+    # Real-time detection
     fr.detect_camera()
 
-    # Deteksi dari gambar
-    result = fr.detect_image("/path/foto.jpg", show=True)
+    # Detect from image
+    result = fr.detect_image("/path/photo.jpg", show=True)
     for face in result.faces:
         print(face.name, face.score)
 
-    # Daftar pengguna
+    # List users
     users = fr.list_users()
 
-    # Hapus pengguna
-    fr.delete_user("Budi")
+    # Delete user
+    fr.delete_user("Alice")
+
+For a full interactive CLI demo, run:
+    python facerecog/example.py
 """
 
 from .config import (
@@ -48,10 +51,10 @@ from .detector import DetectionResult, FaceResult
 
 class FaceRecog:
     """
-    Antarmuka utama modul pengenalan wajah ecolube.id.
+    Main interface for the face recognition module.
 
-    Semua operasi (register, train, detect, manage user) tersedia
-    sebagai method di class ini.
+    All operations (register, train, detect, manage users) are
+    available as methods on this class.
     """
 
     # ── Konfigurasi ──────────────────────────────────────────────────────────
@@ -61,16 +64,19 @@ class FaceRecog:
         threshold: int = CONFIDENCE_THRESHOLD,
         max_photos: int = MAX_PHOTOS,
         camera_index: int = 0,
+        app_name: str = "Face Recognition",
     ):
         """
         Args:
-            threshold   : Batas confidence LBPH (default 75). Lebih rendah = lebih ketat.
-            max_photos  : Jumlah foto per sesi registrasi kamera (default 40).
-            camera_index: Index kamera yang digunakan (default 0).
+            threshold   : LBPH confidence limit (default 75). Lower = stricter.
+            max_photos  : Photos per camera registration session (default 40).
+            camera_index: Camera index to use (default 0).
+            app_name    : Application name shown in OpenCV window titles.
         """
         self.threshold    = threshold
         self.max_photos   = max_photos
         self.camera_index = camera_index
+        self.app_name     = app_name
 
     # ── Registrasi ───────────────────────────────────────────────────────────
 
@@ -97,6 +103,7 @@ class FaceRecog:
             append=append,
             max_photos=self.max_photos,
             camera_index=self.camera_index,
+            app_name=self.app_name,
         )
         return saved
 
@@ -141,27 +148,29 @@ class FaceRecog:
     # ── Deteksi ──────────────────────────────────────────────────────────────
 
     def detect_camera(self) -> None:
-        """Deteksi dan kenali wajah secara real-time dari kamera."""
+        """Detect and recognize faces in real-time from camera."""
         _detector_mod.detect_camera(
             threshold=self.threshold,
             camera_index=self.camera_index,
+            app_name=self.app_name,
         )
 
     def detect_image(self, img_path: str, show: bool = True) -> DetectionResult:
         """
-        Deteksi dan kenali wajah dari file gambar.
+        Detect and recognize faces from an image file.
 
         Args:
-            img_path: Path ke file gambar.
-            show    : Tampilkan jendela hasil (default True).
+            img_path: Path to image file.
+            show    : Show result window (default True).
 
         Returns:
-            DetectionResult — akses `.faces` untuk list FaceResult.
+            DetectionResult — access `.faces` for list of FaceResult.
         """
         return _detector_mod.detect_image(
             img_path=img_path,
             threshold=self.threshold,
             show=show,
+            app_name=self.app_name,
         )
 
     # ── Manajemen Pengguna ───────────────────────────────────────────────────
@@ -193,6 +202,7 @@ class FaceRecog:
         users = _labels_mod.load()
         return (
             f"FaceRecog("
+            f"app_name='{self.app_name}', "
             f"users={len(users)}, "
             f"threshold={self.threshold}, "
             f"max_photos={self.max_photos})"

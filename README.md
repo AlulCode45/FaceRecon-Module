@@ -1,94 +1,110 @@
-# Sistem Pengenalan Wajah — ecolube.id
+# facerecog — Face Recognition Module
 
-Sistem pengenalan wajah berbasis **OpenCV LBPH** (Local Binary Patterns Histograms) yang dapat digunakan melalui **CLI interaktif** maupun **Python API** langsung di kode.
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![OpenCV](https://img.shields.io/badge/opencv--contrib--python-4.8%2B-green)](https://pypi.org/project/opencv-contrib-python/)
 
----
-
-## Struktur Proyek
-
-```
-ecolube.id/
-├── facerecog/
-│   ├── __init__.py   ← FaceRecog class (high-level API)
-│   ├── config.py     ← path & konstanta global
-│   ├── labels.py     ← CRUD labels.json
-│   ├── dataset.py    ← registrasi dari kamera & gambar
-│   ├── trainer.py    ← training model
-│   ├── detector.py   ← deteksi kamera & gambar
-│   └── users.py      ← list & hapus pengguna
-├── dataset/          ← foto wajah per-orang (auto dibuat)
-├── trainer/          ← model hasil training (auto dibuat)
-├── labels.json       ← peta ID → nama (auto dibuat)
-├── main.py           ← CLI interaktif
-├── requirements.txt
-└── README.md
-```
+A lightweight face recognition module based on **OpenCV LBPH** (Local Binary Patterns Histograms).  
+Use it via the **interactive CLI** or embed it directly as a **Python API** in your own project.
 
 ---
 
-## Instalasi
+## Features
 
-**1. Clone / buka project**
+- Register faces from **camera** or **image files / folders**
+- Train the LBPH recognition model
+- Detect & recognize faces **real-time** from camera or from **image files**
+- Manage registered users (list, delete)
+- Clean Python API — one class, zero boilerplate
+- Customizable window titles via `app_name`
 
-**2. Install dependensi**
+---
+
+## Requirements
+
+- Python 3.10+
+- `opencv-contrib-python >= 4.8.0`
+- `numpy >= 1.24.0`
+
+---
+
+## Installation
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/AlulCode45/FaceRecon-Module.git
+cd FaceRecon-Module
+```
+
+**2. Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-> Pastikan menggunakan `opencv-contrib-python` (bukan `opencv-python`), karena modul `cv2.face.LBPHFaceRecognizer` hanya ada di versi contrib.
+> **Important:** Use `opencv-contrib-python`, not `opencv-python`.  
+> The `cv2.face.LBPHFaceRecognizer` module is only available in the contrib build.
 
 ---
 
-## Cara Pakai — CLI Interaktif
+## Project Structure
 
-Jalankan:
+When you use this module, it will automatically create the following in your **working directory**:
+
+```
+your-project/
+├── facerecog/          ← this module (clone here)
+│   ├── __init__.py
+│   ├── config.py
+│   ├── dataset.py
+│   ├── detector.py
+│   ├── labels.py
+│   ├── trainer.py
+│   ├── users.py
+│   ├── example.py
+│   ├── requirements.txt
+│   └── README.md
+├── dataset/            ← auto created: face photos per person
+├── trainer/            ← auto created: trained model output
+└── labels.json         ← auto created: ID → name mapping
+```
+
+---
+
+## Usage — Interactive CLI
+
+Run the built-in CLI demo:
 
 ```bash
-python main.py
+python facerecog/example.py
 ```
 
-Akan muncul menu:
+Menu:
 
 ```
 ==============================================
-         SISTEM PENGENALAN WAJAH
-                ecolube.id
+         FACE RECOGNITION SYSTEM
 ==============================================
-  [1]  Register  — Daftarkan wajah via kamera
-  [2]  Train     — Latih model
-  [3]  Detect    — Deteksi wajah real-time
-  [4]  List      — Lihat daftar pengguna
-  [5]  Delete    — Hapus pengguna
-  [6]  Detect    — Deteksi wajah dari gambar
-  [7]  Register  — Daftarkan wajah dari gambar
-  [0]  Keluar
+  [1]  Register  — Register face via camera
+  [2]  Train     — Train the model
+  [3]  Detect    — Real-time face detection
+  [4]  List      — List registered users
+  [5]  Delete    — Delete a user
+  [6]  Detect    — Detect face from image
+  [7]  Register  — Register face from image
+  [0]  Exit
 ==============================================
 ```
 
-### Alur Dasar
+### Basic flow
 
 ```
-[1] atau [7] Register  →  [2] Train  →  [3] atau [6] Detect
+[1] or [7] Register  →  [2] Train  →  [3] or [6] Detect
 ```
-
-### Penjelasan Menu
-
-| Menu  | Fungsi                | Keterangan                                        |
-| ----- | --------------------- | ------------------------------------------------- |
-| `[1]` | Register via kamera   | Ambil 40 foto wajah secara real-time              |
-| `[7]` | Register via gambar   | Input path file atau folder gambar                |
-| `[2]` | Train model           | Wajib dijalankan setelah register                 |
-| `[3]` | Deteksi real-time     | Kamera aktif, tutup dengan `q` / `Esc` / tombol X |
-| `[6]` | Deteksi dari gambar   | Input path gambar, hasil tampil di jendela        |
-| `[4]` | Lihat daftar pengguna | Tampilkan ID, nama, jumlah foto                   |
-| `[5]` | Hapus pengguna        | Hapus data foto + label                           |
 
 ---
 
-## Cara Pakai — Python API
-
-Import class `FaceRecog` dari modul `facerecog`:
+## Usage — Python API
 
 ```python
 from facerecog import FaceRecog
@@ -96,172 +112,180 @@ from facerecog import FaceRecog
 fr = FaceRecog()
 ```
 
-### Konfigurasi (opsional)
+### Configuration (optional)
 
 ```python
 fr = FaceRecog(
-    threshold=75,      # confidence LBPH, lebih rendah = lebih ketat (default 75)
-    max_photos=40,     # jumlah foto per sesi kamera (default 40)
-    camera_index=0,    # index kamera (default 0)
+    threshold=75,                # LBPH confidence: lower = stricter match (default 75)
+    max_photos=40,               # photos captured per camera session (default 40)
+    camera_index=0,              # camera device index (default 0)
+    app_name="My App",           # label in OpenCV window titles (default "Face Recognition")
 )
 ```
 
 ---
 
-### Register Wajah
+### Register Faces
 
-**Via kamera:**
+**Via camera:**
 
 ```python
-saved = fr.register_from_camera("Budi")
-print(f"{saved} foto tersimpan")
+saved = fr.register_from_camera("Alice")
+print(f"{saved} photos saved")
 ```
 
-**Via file gambar tunggal:**
+**Via single image file:**
 
 ```python
-saved = fr.register_from_image("Budi", "/path/ke/foto_budi.jpg")
+saved = fr.register_from_image("Alice", "/path/to/alice.jpg")
 ```
 
-**Via folder berisi banyak gambar:**
+**Via folder containing multiple images:**
 
 ```python
-saved = fr.register_from_image("Budi", "/path/ke/folder_foto/")
+saved = fr.register_from_image("Alice", "/path/to/alice_photos/")
 ```
 
-Format gambar yang didukung: `.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`
+Supported formats: `.jpg`, `.jpeg`, `.png`, `.bmp`, `.webp`
 
-**Opsi overwrite / append:**
+**Overwrite / append:**
 
 ```python
-# Timpa data lama
-fr.register_from_image("Budi", "/foto/", overwrite=True)
+# Replace existing data
+fr.register_from_image("Alice", "/photos/", overwrite=True)
 
-# Tambah ke data yang sudah ada (default)
-fr.register_from_image("Budi", "/foto/", append=True)
+# Add to existing data (default)
+fr.register_from_image("Alice", "/photos/", append=True)
 ```
 
 ---
 
-### Training Model
+### Train the Model
 
 ```python
 info = fr.train()
 print(info)
-# {"total_images": 80, "total_persons": 2, "model_path": "/path/trainer/trainer.yml"}
+# {"total_images": 80, "total_persons": 2, "model_path": "trainer/trainer.yml"}
 ```
 
-> Wajib dijalankan ulang setiap kali ada penambahan atau penghapusan data.
+> **Must be re-run** whenever faces are added or deleted.
 
 ---
 
-### Deteksi Wajah
+### Detect Faces
 
-**Real-time dari kamera:**
+**Real-time from camera:**
 
 ```python
 fr.detect_camera()
-# Tutup dengan q, Esc, atau klik tombol X pada window
+# Close with q, Esc, or click X on the window
 ```
 
-**Dari file gambar (dengan tampilan window):**
+**From image file (with result window):**
 
 ```python
-result = fr.detect_image("foto.jpg", show=True)
+result = fr.detect_image("photo.jpg", show=True)
 ```
 
-**Dari file gambar (tanpa tampilan window, hanya data):**
+**From image file (data only, no window):**
 
 ```python
-result = fr.detect_image("foto.jpg", show=False)
+result = fr.detect_image("photo.jpg", show=False)
 
-print(f"Total wajah: {result.total_faces}")
+print(f"Faces found: {result.total_faces}")
 
 for face in result.faces:
-    print(face.name)        # nama orang / "Tidak Dikenal"
+    print(face.name)        # person name / "Unknown"
     print(face.recognized)  # True / False
-    print(face.score)       # keyakinan dalam persen (0-100)
-    print(face.confidence)  # raw LBPH confidence (lebih rendah = lebih yakin)
-    print(face.x, face.y, face.w, face.h)  # posisi & ukuran bounding box
+    print(face.score)       # confidence percentage (0–100)
+    print(face.confidence)  # raw LBPH value (lower = more confident)
+    print(face.x, face.y, face.w, face.h)  # bounding box
 ```
 
-**Contoh: cek apakah wajah dikenali**
+**Check if a face is recognized:**
 
 ```python
-result = fr.detect_image("foto.jpg", show=False)
+result = fr.detect_image("photo.jpg", show=False)
 
 for face in result.faces:
     if face.recognized:
-        print(f"Dikenali: {face.name} ({face.score}%)")
+        print(f"Recognized: {face.name} ({face.score}%)")
     else:
-        print("Wajah tidak dikenal")
+        print("Unknown face")
 ```
 
 ---
 
-### Manajemen Pengguna
+### User Management
 
-**Lihat daftar pengguna:**
+**List all users:**
 
 ```python
 users = fr.list_users()
 for u in users:
     print(u["id"], u["name"], u["photos"])
-# 1  Budi   40
-# 2  Siti   35
+# 1  Alice   40
+# 2  Bob     35
 ```
 
-**Hapus pengguna:**
+**Delete a user:**
 
 ```python
-info = fr.delete_user("Budi")
+info = fr.delete_user("Alice")
 print(info)
-# {"id": 1, "name": "Budi", "photos_deleted": 40}
+# {"id": 1, "name": "Alice", "photos_deleted": 40}
 ```
 
-> Setelah hapus, jalankan `fr.train()` ulang agar model diperbarui.
+> After deleting, call `fr.train()` again to update the model.
 
 ---
 
-### Info Instance
+### Instance Info
 
 ```python
 print(fr)
-# FaceRecog(users=2, threshold=75, max_photos=40)
+# FaceRecog(app_name='Face Recognition', users=2, threshold=75, max_photos=40)
 ```
 
 ---
 
-## Contoh Lengkap
+## Full Example
 
 ```python
 from facerecog import FaceRecog
 
-fr = FaceRecog(threshold=70)
+fr = FaceRecog(threshold=70, app_name="Security System")
 
-# 1. Daftarkan dua orang dari folder foto
-fr.register_from_image("Budi", "./foto/budi/")
-fr.register_from_image("Siti", "./foto/siti/")
+# 1. Register people from photo folders
+fr.register_from_image("Alice", "./photos/alice/")
+fr.register_from_image("Bob",   "./photos/bob/")
 
-# 2. Train model
+# 2. Train the model
 info = fr.train()
-print(f"Training selesai: {info['total_images']} gambar, {info['total_persons']} orang")
+print(f"Done: {info['total_images']} images, {info['total_persons']} people")
 
-# 3. Cek siapa yang ada di foto
-result = fr.detect_image("./test/foto_group.jpg", show=True)
+# 3. Detect faces in a group photo
+result = fr.detect_image("group.jpg", show=True)
 for face in result.faces:
-    status = f"{face.name} ({face.score}%)" if face.recognized else "Tidak Dikenal"
-    print(f"Wajah di ({face.x},{face.y}): {status}")
+    status = f"{face.name} ({face.score}%)" if face.recognized else "Unknown"
+    print(f"Face at ({face.x},{face.y}): {status}")
 
-# 4. Deteksi real-time
+# 4. Real-time detection
 fr.detect_camera()
 ```
 
 ---
 
-## Catatan
+## Notes
 
-- Model disimpan di `trainer/trainer.yml` dan labels di `labels.json` — keduanya otomatis dibuat.
-- Semakin banyak foto dataset, semakin akurat hasil pengenalan.
-- Jika kamera tidak terdeteksi, coba ubah `camera_index=1` atau `camera_index=2`.
-- Gunakan foto wajah yang jelas, pencahayaan cukup, dan menghadap depan untuk hasil terbaik.
+- `dataset/`, `trainer/`, and `labels.json` are created in your **current working directory** — not inside the module folder.
+- More training photos = better accuracy.
+- If the camera is not detected, try `camera_index=1` or `camera_index=2`.
+- Use clear, well-lit, front-facing photos for best results.
+- The `app_name` parameter sets the title of all OpenCV windows — useful when integrating into a larger app.
+
+---
+
+## License
+
+MIT

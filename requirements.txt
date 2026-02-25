@@ -1,0 +1,9 @@
+# facerecog — Face Recognition Module
+# Install with: pip install -r requirements.txt
+
+# opencv-contrib-python includes opencv-python + extra modules
+# (cv2.face.LBPHFaceRecognizer required for training)
+opencv-contrib-python>=4.8.0
+
+# Array/matrix computation for face data
+numpy>=1.24.0

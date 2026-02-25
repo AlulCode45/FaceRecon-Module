@@ -61,16 +61,18 @@ def register_from_camera(
     append: bool = True,
     max_photos: int = MAX_PHOTOS,
     camera_index: int = 0,
+    app_name: str = "Face Recognition",
 ) -> int:
     """
-    Ambil foto wajah dari kamera dan simpan sebagai data training.
+    Capture face photos from camera and save as training data.
 
     Args:
-        name        : Nama orang yang didaftarkan.
-        overwrite   : Hapus dataset lama sebelum menyimpan.
-        append      : Tambah ke dataset yang sudah ada.
-        max_photos  : Jumlah foto yang diambil.
-        camera_index: Index kamera (default 0).
+        name        : Person's name to register.
+        overwrite   : Delete old dataset before saving.
+        append      : Add to existing dataset.
+        max_photos  : Number of photos to capture.
+        camera_index: Camera index (default 0).
+        app_name    : Application name shown in window title.
 
     Returns:
         Jumlah foto yang berhasil disimpan.
@@ -88,7 +90,7 @@ def register_from_camera(
 
     count   = _count_existing(person_dir)
     saved   = 0
-    WIN     = "Registrasi Wajah — ecolube.id"
+    WIN     = f"Register Face — {app_name}"
     cv2.namedWindow(WIN, cv2.WINDOW_NORMAL)
 
     while saved < max_photos:
@@ -114,11 +116,11 @@ def register_from_camera(
             cv2.putText(frame, f"{saved}/{max_photos}", (x, y - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 220, 0), 2)
 
-        cv2.putText(frame, f"Register: {name}", (10, 30),
+        cv2.putText(frame, f"Registering: {name}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 220, 0), 2)
-        cv2.putText(frame, f"Foto: {saved}/{max_photos}", (10, 62),
+        cv2.putText(frame, f"Photos: {saved}/{max_photos}", (10, 62),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 220, 0), 2)
-        cv2.putText(frame, "Tekan 'q' / Esc untuk batal", (10, frame.shape[0] - 12),
+        cv2.putText(frame, "Press 'q' / Esc to cancel", (10, frame.shape[0] - 12),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 100, 255), 2)
         cv2.imshow(WIN, frame)
 

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "facerecog-lbph"
+version = "1.0.0"
+description = "A lightweight face recognition module using OpenCV LBPH (Local Binary Patterns Histograms)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+keywords = ["face-recognition", "opencv", "lbph", "computer-vision", "face-detection"]
+authors = [
+  { name = "AlulCode45" }
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Image Recognition",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "opencv-contrib-python>=4.8.0",
+  "numpy>=1.24.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/AlulCode45/FaceRecon-Module"
+Repository = "https://github.com/AlulCode45/FaceRecon-Module"
+"Bug Tracker" = "https://github.com/AlulCode45/FaceRecon-Module/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["facerecog*"]

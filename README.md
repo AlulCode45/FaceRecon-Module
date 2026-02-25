@@ -29,16 +29,17 @@ Use it via the **interactive CLI** or embed it directly as a **Python API** in y
 
 ## Installation
 
-**1. Clone the repository**
+### From PyPI (recommended)
+
+```bash
+pip install facerecog-lbph
+```
+
+### From source
 
 ```bash
 git clone https://github.com/AlulCode45/FaceRecon-Module.git
 cd FaceRecon-Module
-```
-
-**2. Install dependencies**
-
-```bash
 pip install -r requirements.txt
 ```
 
@@ -53,16 +54,10 @@ When you use this module, it will automatically create the following in your **w
 
 ```
 your-project/
-├── facerecog/          ← this module (clone here)
-│   ├── __init__.py
-│   ├── config.py
-│   ├── dataset.py
-│   ├── detector.py
-│   ├── labels.py
-│   ├── trainer.py
-│   ├── users.py
-│   ├── example.py
-│   ├── requirements.txt
+├── facerecog/          ← this repo (if using from source)
+│   ├── facerecog/      ← the Python package
+│   ├── example.py      ← standalone CLI demo
+│   ├── pyproject.toml
 │   └── README.md
 ├── dataset/            ← auto created: face photos per person
 ├── trainer/            ← auto created: trained model output
@@ -76,7 +71,7 @@ your-project/
 Run the built-in CLI demo:
 
 ```bash
-python facerecog/example.py
+python example.py
 ```
 
 Menu:

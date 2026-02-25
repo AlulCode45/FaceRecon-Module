@@ -1,8 +1,8 @@
 """
 example.py — Interactive CLI demo for the facerecog module.
 
-Run from your project root:
-    python facerecog/example.py
+Run from the repo root:
+    python example.py
 
 All data (dataset/, trainer/, labels.json) will be created
 in your current working directory.
